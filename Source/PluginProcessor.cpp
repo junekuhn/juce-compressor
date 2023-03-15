@@ -95,6 +95,11 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    juce::dsp::ProcessSpec spec;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = getTotalNumOutputChannels();
+    spec.sampleRate = sampleRate;
+    compressor.prepare(spec);
 }
 
 void NewProjectAudioProcessor::releaseResources()
@@ -144,18 +149,10 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
-    }
+    auto block = juce::dsp::AudioBlock<float>(buffer);
+    auto context = juce::dsp::ProcessContextReplacing<float>(block);
+    
+    compressor.process(context);
 }
 
 //==============================================================================
@@ -175,12 +172,18 @@ void NewProjectAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    juce::MemoryOutputStream mos(destData, true);
+    apvts.state.writeToStream(mos);
 }
 
 void NewProjectAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+    auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
+    if(tree.isValid()){
+        apvts.replaceState(tree);
+    }
 }
 
 //==============================================================================
@@ -188,4 +191,30 @@ void NewProjectAudioProcessor::setStateInformation (const void* data, int sizeIn
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new NewProjectAudioProcessor();
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::createParameterLayout() {
+    APVTS::ParameterLayout layout;
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Threshold",
+                                                          "Threshold",
+                                                          juce::NormalisableRange<float>(-60, 12, 1, 1),
+                                                           0));
+    auto attackReleaseRange = juce::NormalisableRange<float>(5, 500, 1, 1);
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Attack",
+                                                          "Attack",
+                                                           attackReleaseRange,
+                                                           50));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Release",
+                                                          "Release",
+                                                           attackReleaseRange,
+                                                           50));
+    auto choices = std::vector<double>{1, 1.5, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 100};
+    juce::StringArray sa;
+    for( auto choice : choices ){
+        sa.add(juce::String(choice, 1));
+    }
+    layout.add(std::make_unique<juce::AudioParameterChoice>("Ratio", "Ratio", sa, 3));
+    
+    return layout;
 }
