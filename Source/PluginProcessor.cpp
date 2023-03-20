@@ -22,21 +22,31 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
                        )
 #endif
 {
-    compressor.attack = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter("Attack"));
-    jassert(compressor.attack != nullptr);
+    using namespace Params;
+    const auto& params = GetParams();
     
-    compressor.release = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter("Release"));
-    jassert(compressor.release != nullptr);
+    auto floatHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName){
+        param = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter(params.at(paramName)));
+        jassert(param != nullptr);
+    };
     
-    compressor.threshold = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter("Threshold"));
-    jassert(compressor.threshold != nullptr);
+    floatHelper(compressor.attack, Names::Attack_Low_Band);
+    floatHelper(compressor.release, Names::Release_Low_Band);
+    floatHelper(compressor.threshold, Names::Threshold_Low_Band);
     
-    compressor.ratio = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter("Ratio"));
-    jassert(compressor.ratio != nullptr);
+    auto choiceHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName){
+        param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));
+        jassert(param != nullptr);
+    };
     
-    compressor.bypassed = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter("Bypassed"));
-    jassert(compressor.bypassed != nullptr);
+    choiceHelper(compressor.ratio, Names::Ratio_Low_Band);
+
+    auto boolHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName){
+        param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));
+        jassert(param != nullptr);
+    };
     
+    boolHelper(compressor.bypassed, Names::Bypassed_Low_Band);
 }
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
@@ -219,18 +229,20 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::createParameterLayout() {
     APVTS::ParameterLayout layout;
+    using namespace Params;
+    const auto& params = GetParams();
     
-    layout.add(std::make_unique<juce::AudioParameterFloat>("Threshold",
-                                                          "Threshold",
+    layout.add(std::make_unique<juce::AudioParameterFloat>(params.at(Names::Threshold_Low_Band),
+                                                          params.at(Names::Threshold_Low_Band),
                                                           juce::NormalisableRange<float>(-60, 12, 1, 1),
                                                            0));
     auto attackReleaseRange = juce::NormalisableRange<float>(5, 500, 1, 1);
-    layout.add(std::make_unique<juce::AudioParameterFloat>("Attack",
-                                                          "Attack",
+    layout.add(std::make_unique<juce::AudioParameterFloat>(params.at(Names::Attack_Low_Band),
+                                                          params.at(Names::Attack_Low_Band),
                                                            attackReleaseRange,
                                                            50));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("Release",
-                                                          "Release",
+    layout.add(std::make_unique<juce::AudioParameterFloat>(params.at(Names::Release_Low_Band),
+                                                          params.at(Names::Release_Low_Band),
                                                            attackReleaseRange,
                                                            50));
     auto choices = std::vector<double>{1, 1.5, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 100};
@@ -238,8 +250,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     for( auto choice : choices ){
         sa.add(juce::String(choice, 1));
     }
-    layout.add(std::make_unique<juce::AudioParameterChoice>("Ratio", "Ratio", sa, 3));
-    layout.add(std::make_unique<juce::AudioParameterBool>("Bypassed", "Bypassed", false));
+    layout.add(std::make_unique<juce::AudioParameterChoice>(params.at(Names::Ratio_Low_Band), params.at(Names::Ratio_Low_Band), sa, 3));
+    layout.add(std::make_unique<juce::AudioParameterBool>(params.at(Names::Bypassed_Low_Band), params.at(Names::Bypassed_Low_Band), false));
     
     return layout;
 }
