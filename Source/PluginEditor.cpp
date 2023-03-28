@@ -9,13 +9,22 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+Placeholder::Placeholder() {
+    juce::Random r;
+    customColor = juce::Colour(r.nextInt(255), r.nextInt(), r.nextInt());
+}
+
 //==============================================================================
 NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    addAndMakeVisible(controlBar);
+    addAndMakeVisible(analyser);
+    addAndMakeVisible(globalControls);
+    addAndMakeVisible(bandControls);
+    setSize (600, 500);
 }
 
 NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
@@ -37,4 +46,9 @@ void NewProjectAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
+    auto bounds = getLocalBounds();
+    controlBar.setBounds(bounds.removeFromTop(32));
+    bandControls.setBounds(bounds.removeFromBottom(135));
+    analyser.setBounds(bounds.removeFromTop(225));
+    globalControls.setBounds(bounds);
 }
