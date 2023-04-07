@@ -5,6 +5,33 @@
               companyName="junebug sounds">
   <MAINGROUP id="pNA6ew" name="basic2">
     <GROUP id="{66137BEC-5756-4CB9-8154-ED950BEF51AB}" name="Source">
+      <GROUP id="{90CE0AAB-7521-FC47-3426-5A0488B0D4EA}" name="DSP"/>
+      <GROUP id="{85C54704-F83F-BA24-5024-3551C6653DAB}" name="GUI">
+        <FILE id="zXwB6B" name="ComponentHelpers.cpp" compile="1" resource="0"
+              file="Source/GUI/ComponentHelpers.cpp"/>
+        <FILE id="vwXGRU" name="ComponentHelpers.h" compile="0" resource="0"
+              file="Source/GUI/ComponentHelpers.h"/>
+        <FILE id="R50X75" name="CompressorBandControls.cpp" compile="1" resource="0"
+              file="Source/GUI/CompressorBandControls.cpp"/>
+        <FILE id="HUOI6B" name="CompressorBandControls.h" compile="0" resource="0"
+              file="Source/GUI/CompressorBandControls.h"/>
+        <FILE id="uNUClu" name="CustomButtons.cpp" compile="1" resource="0"
+              file="Source/GUI/CustomButtons.cpp"/>
+        <FILE id="WmT6mz" name="CustomButtons.h" compile="0" resource="0" file="Source/GUI/CustomButtons.h"/>
+        <FILE id="DXbSua" name="CustomSliders.cpp" compile="1" resource="0"
+              file="Source/GUI/CustomSliders.cpp"/>
+        <FILE id="xII0rg" name="CustomSliders.h" compile="0" resource="0" file="Source/GUI/CustomSliders.h"/>
+        <FILE id="nKnt66" name="GlobalControls.cpp" compile="1" resource="0"
+              file="Source/GUI/GlobalControls.cpp"/>
+        <FILE id="ANsCh6" name="GlobalControls.h" compile="0" resource="0"
+              file="Source/GUI/GlobalControls.h"/>
+        <FILE id="wSZvW2" name="LabelHelpers.h" compile="0" resource="0" file="Source/GUI/LabelHelpers.h"/>
+        <FILE id="mxl9Tp" name="LabelHelpers.cpp" compile="1" resource="0"
+              file="Source/GUI/LabelHelpers.cpp"/>
+        <FILE id="ac8c1l" name="LambdaHelpers.h" compile="0" resource="0" file="Source/GUI/LambdaHelpers.h"/>
+        <FILE id="Zgmkme" name="LookAndFeel.cpp" compile="1" resource="0" file="Source/GUI/LookAndFeel.cpp"/>
+        <FILE id="dOypNT" name="LookAndFeel.h" compile="0" resource="0" file="Source/GUI/LookAndFeel.h"/>
+      </GROUP>
       <FILE id="vztQub" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="lSHHrQ" name="PluginProcessor.h" compile="0" resource="0"
